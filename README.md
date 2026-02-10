@@ -7,7 +7,7 @@ A Spring Boot library that generates sitemaps dynamically from annotated control
 - **Annotation-driven**: Mark endpoints with `@Sitemap(priority=0.8, changefreq=WEEKLY)` to include them in the sitemap
 - **Auto-scan**: Optionally scan all `@GetMapping` endpoints automatically
 - **Programmatic API**: Add/remove URLs at runtime via `SitemapHolder`
-- **Multilingual (hreflang)**: Generate `<xhtml:link rel="alternate" hreflang="...">` entries with configurable locale resolution (annotation > config > auto-detect)
+- **Multilingual (hreflang)**: Generate `<xhtml:link rel="alternate" hreflang="...">` entries with configurable locale resolution (annotation > config)
 - **Two locale URL patterns**: `PATH_PREFIX` (`/en/about`) or `QUERY_PARAM` (`?lang=en`)
 - **Sitemap Index**: Automatically splits into multiple sitemaps when URLs exceed 50,000
 - **Thread-safe**: Volatile-cached XML with `ConcurrentHashMap` and `ReentrantReadWriteLock`
@@ -20,7 +20,7 @@ A Spring Boot library that generates sitemaps dynamically from annotated control
 ```kotlin
 // build.gradle.kts
 dependencies {
-    implementation("net.menoita:sitemap-spring-boot-starter:0.1.0-SNAPSHOT")
+    implementation("net.menoita:sitemap-spring-boot-starter:1.0.0")
 }
 ```
 
