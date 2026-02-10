@@ -93,18 +93,13 @@ publishing {
         }
     }
     repositories {
-        // Maven Central via Sonatype OSSRH
+        // Maven Central via Sonatype Central Portal (OSSRH Staging API compatibility service)
         maven {
-            name = "OSSRH"
-            url = uri(
-                if (version.toString().endsWith("SNAPSHOT"))
-                    "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-                else
-                    "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            )
+            name = "CentralPortal"
+            url = uri("https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")
             credentials {
-                username = System.getenv("OSSRH_USERNAME")
-                password = System.getenv("OSSRH_PASSWORD")
+                username = System.getenv("CENTRAL_TOKEN_USERNAME")
+                password = System.getenv("CENTRAL_TOKEN_PASSWORD")
             }
         }
         // GitHub Packages
@@ -128,5 +123,5 @@ signing {
 
 // Only require signing when actually publishing (not during local builds)
 tasks.withType<Sign> {
-    onlyIf { gradle.taskGraph.hasTask("publish") }
+    onlyIf { gradle.taskGraph.allTasks.any { it.name.startsWith("publish") } }
 }
