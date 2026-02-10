@@ -256,6 +256,20 @@ When URLs exceed `max-urls-per-sitemap` (default: 50,000), the library automatic
 - **Cache**: `volatile` fields ensure cross-thread visibility when XML is invalidated
 - **Generation**: `ReentrantReadWriteLock` prevents thundering herd on cache regeneration
 
+## Sitemap Protocol Compliance
+
+This library generates XML that is fully compliant with the [sitemaps.org protocol specification](https://www.sitemaps.org/protocol.html):
+
+- **`<urlset>`** with the required `xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"` namespace
+- **`<url>`** entries with required `<loc>` and optional `<lastmod>`, `<changefreq>`, `<priority>`
+- **`<lastmod>`** formatted in [W3C Datetime](http://www.w3.org/TR/NOTE-datetime) (`YYYY-MM-DD` or full datetime)
+- **`<changefreq>`** values: `always`, `hourly`, `daily`, `weekly`, `monthly`, `yearly`, `never`
+- **`<priority>`** values: `0.0` to `1.0` (default `0.5`)
+- **Entity escaping**: `&`, `'`, `"`, `>`, `<` are properly escaped as `&amp;`, `&apos;`, `&quot;`, `&gt;`, `&lt;`
+- **Sitemap Index**: `<sitemapindex>` with `<sitemap>` entries when URLs exceed 50,000 per file
+- **UTF-8 encoding**: all output is UTF-8 encoded with the XML declaration
+- **hreflang**: `<xhtml:link rel="alternate" hreflang="..."/>` following [Google's internationalization guidelines](https://developers.google.com/search/docs/specialty/international/localized-versions#sitemap)
+
 ## Requirements
 
 - Java 17+
