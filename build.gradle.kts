@@ -121,7 +121,11 @@ signing {
     sign(publishing.publications["mavenJava"])
 }
 
-// Only require signing when actually publishing (not during local builds)
+// Only require signing when publishing to remote repositories (not local builds)
 tasks.withType<Sign> {
-    onlyIf { gradle.taskGraph.allTasks.any { it.name.startsWith("publish") } }
+    onlyIf {
+        gradle.taskGraph.allTasks.any {
+            it.name.startsWith("publish") && !it.name.contains("MavenLocal")
+        }
+    }
 }
