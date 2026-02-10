@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link SitemapLocaleResolver}.
- * Tests the locale priority chain (annotation > config > LocaleResolver),
+ * Tests the locale priority chain (annotation > config),
  * URL building with both PATH_PREFIX and QUERY_PARAM patterns,
  * and alternates map construction.
  */
@@ -27,8 +27,7 @@ class SitemapLocaleResolverTest {
         properties = new SitemapProperties();
         properties.setBaseUrl("https://example.com");
         properties.setLocaleUrlPattern(LocaleUrlPattern.PATH_PREFIX);
-        // No Spring LocaleResolver in unit tests
-        resolver = new SitemapLocaleResolver(properties, null);
+        resolver = new SitemapLocaleResolver(properties);
     }
 
     // --- Locale resolution priority chain ---
@@ -202,7 +201,7 @@ class SitemapLocaleResolverTest {
     @DisplayName("buildUrl: normalizes base URL with trailing slash")
     void buildUrlNormalizesBaseUrl() {
         properties.setBaseUrl("https://example.com/");
-        SitemapLocaleResolver r = new SitemapLocaleResolver(properties, null);
+        SitemapLocaleResolver r = new SitemapLocaleResolver(properties);
 
         assertEquals("https://example.com/about", r.buildUrl("/about"));
     }

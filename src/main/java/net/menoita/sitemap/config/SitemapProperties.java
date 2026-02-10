@@ -106,9 +106,8 @@ public class SitemapProperties {
 
     /**
      * Explicit list of locale codes for hreflang alternate link generation.
-     * When non-empty, overrides auto-detection from Spring's {@code LocaleResolver}.
-     * Can still be overridden per-endpoint by {@code @Sitemap(locales={...})}.
-     * An empty list means "fall back to auto-detection via LocaleResolver".
+     * Can be overridden per-endpoint by {@code @Sitemap(locales={...})}.
+     * An empty list means no hreflang alternates are generated.
      * Default: empty list.
      */
     private List<String> locales = new ArrayList<>();

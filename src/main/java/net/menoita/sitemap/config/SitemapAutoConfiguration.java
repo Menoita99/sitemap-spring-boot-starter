@@ -5,13 +5,11 @@ import net.menoita.sitemap.core.SitemapEndpointScanner;
 import net.menoita.sitemap.core.SitemapHolder;
 import net.menoita.sitemap.core.SitemapLocaleResolver;
 import net.menoita.sitemap.core.SitemapXmlGenerator;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
@@ -54,20 +52,13 @@ public class SitemapAutoConfiguration {
     /**
      * Creates the locale resolver bean for sitemap hreflang generation.
      *
-     * <p>Optionally uses the Spring {@link LocaleResolver} if one is available
-     * in the application context. If none is present, locale auto-detection
-     * from Spring is disabled (config and annotation locales still work).</p>
-     *
-     * @param properties     the sitemap configuration properties
-     * @param localeResolver the optional Spring LocaleResolver
+     * @param properties the sitemap configuration properties
      * @return a new SitemapLocaleResolver instance
      */
     @Bean
     @ConditionalOnMissingBean
-    public SitemapLocaleResolver sitemapLocaleResolver(
-            SitemapProperties properties,
-            ObjectProvider<LocaleResolver> localeResolver) {
-        return new SitemapLocaleResolver(properties, localeResolver.getIfAvailable());
+    public SitemapLocaleResolver sitemapLocaleResolver(SitemapProperties properties) {
+        return new SitemapLocaleResolver(properties);
     }
 
     /**

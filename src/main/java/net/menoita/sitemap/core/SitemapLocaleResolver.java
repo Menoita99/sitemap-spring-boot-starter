@@ -4,7 +4,6 @@ import net.menoita.sitemap.config.SitemapProperties;
 import net.menoita.sitemap.config.SitemapProperties.LocaleUrlPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.LocaleResolver;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,13 +14,12 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Resolves locales for sitemap hreflang generation using a three-tier priority chain.
+ * Resolves locales for sitemap hreflang generation using a two-tier priority chain.
  *
  * <p>The priority chain (highest to lowest):</p>
  * <ol>
  *   <li>{@code @Sitemap(locales={...})} annotation on the method/class</li>
  *   <li>{@code sitemap.locales} configuration property</li>
- *   <li>Auto-detection from Spring's {@link LocaleResolver} bean</li>
  * </ol>
  *
  * <p>If no locales are resolved at any level, no hreflang alternates are generated
@@ -41,30 +39,26 @@ public class SitemapLocaleResolver {
     private static final Logger log = LoggerFactory.getLogger(SitemapLocaleResolver.class);
 
     private final SitemapProperties properties;
-    private final LocaleResolver localeResolver;
 
     /**
      * Constructs a new SitemapLocaleResolver.
      *
-     * @param properties     the sitemap configuration properties
-     * @param localeResolver the Spring LocaleResolver for auto-detection (may be null)
+     * @param properties the sitemap configuration properties
      */
-    public SitemapLocaleResolver(SitemapProperties properties, LocaleResolver localeResolver) {
+    public SitemapLocaleResolver(SitemapProperties properties) {
         this.properties = properties;
-        this.localeResolver = localeResolver;
     }
 
     /**
-     * Resolves locales for an endpoint, applying the three-tier priority chain.
+     * Resolves locales for an endpoint, applying the two-tier priority chain.
      *
      * <ol>
      *   <li>If {@code annotationLocales} is non-empty, those are used (highest priority).</li>
      *   <li>Otherwise, if {@code sitemap.locales} config property is non-empty, those are used.</li>
-     *   <li>Otherwise, attempts auto-detection from Spring's {@link LocaleResolver}.
-     *       Since {@code LocaleResolver} typically resolves a single locale per-request,
-     *       auto-detection returns the default locale only. For multi-locale support,
-     *       explicit configuration is recommended.</li>
      * </ol>
+     *
+     * <p>If no locales are resolved at any level, an empty list is returned and no
+     * hreflang alternates are generated for the endpoint.</p>
      *
      * @param annotationLocales locales from the {@code @Sitemap} annotation (may be empty or null)
      * @return resolved list of locale codes, or empty if none configured at any level
@@ -84,12 +78,6 @@ public class SitemapLocaleResolver {
                             log.debug("Using config-level locales: {}", list);
                             return list;
                         }))
-                // Priority 3: auto-detect from Spring's LocaleResolver.
-                // Note: LocaleResolver.resolveLocale() requires an HttpServletRequest, which is
-                // unavailable at scan time. Spring Boot also always registers a default
-                // AcceptHeaderLocaleResolver, making Locale.getDefault() unreliable as a signal.
-                // For multilingual sitemaps, explicitly configure sitemap.locales or use
-                // @Sitemap(locales={...}) on each endpoint.
                 .orElseGet(() -> {
                     log.debug("No locales resolved — configure sitemap.locales for multilingual support");
                     return Collections.emptyList();

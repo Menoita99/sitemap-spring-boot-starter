@@ -22,7 +22,6 @@ import java.lang.annotation.Target;
  * <ol>
  *   <li>{@link #locales()} on this annotation (highest priority)</li>
  *   <li>{@code sitemap.locales} configuration property</li>
- *   <li>Auto-detection from Spring's {@code LocaleResolver} bean (lowest priority)</li>
  * </ol>
  *
  * <h3>Example usage</h3>
@@ -80,9 +79,9 @@ public @interface Sitemap {
     /**
      * Locale codes for hreflang alternate link generation.
      *
-     * <p>When set (non-empty array), this <strong>overrides</strong> both the
-     * configuration-level locales and auto-detected locales for this endpoint.
-     * An empty array (the default) means "fall back to config or auto-detection".</p>
+     * <p>When set (non-empty array), this <strong>overrides</strong> the
+     * configuration-level locales for this endpoint.
+     * An empty array (the default) means "fall back to config-level locales".</p>
      *
      * <p>Example: {@code @Sitemap(locales = {"en", "pt", "es"})}</p>
      *
