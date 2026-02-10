@@ -14,16 +14,17 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import java.lang.reflect.Method;
+import org.springframework.web.bind.annotation.RequestMethod;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -115,16 +116,16 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
 
         log.info("Scanning controller endpoints for sitemap registration...");
 
-        var allowedMethods = properties.getAutoScanMethods();
-        var discoveredUrls = handlerMapping.getHandlerMethods().entrySet().stream()
+        Set<String> allowedMethods = properties.getAutoScanMethods();
+        List<SitemapUrl> discoveredUrls = handlerMapping.getHandlerMethods().entrySet().stream()
                 .filter(entry -> !entry.getValue().getMethod().isAnnotationPresent(SitemapExclude.class))
                 .flatMap(entry -> {
-                    var mappingInfo = entry.getKey();
-                    var handlerMethod = entry.getValue();
-                    var effectiveAnnotation = resolveAnnotation(handlerMethod);
+                    RequestMappingInfo mappingInfo = entry.getKey();
+                    HandlerMethod handlerMethod = entry.getValue();
+                    Sitemap effectiveAnnotation = resolveAnnotation(handlerMethod);
 
                     if (!shouldInclude(effectiveAnnotation, mappingInfo, allowedMethods)) {
-                        return java.util.stream.Stream.<SitemapUrl>empty();
+                        return Stream.empty();
                     }
 
                     return extractPatterns(mappingInfo).stream()
@@ -160,11 +161,11 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
      */
     private List<SitemapUrl> buildUrlsForPattern(String pattern, Sitemap annotation) {
         double priority = resolvePriority(annotation);
-        var changefreq = resolveChangefreq(annotation);
-        var lastmod = resolveLastmod(annotation);
-        var annotationLocales = annotation != null ? annotation.locales() : new String[0];
+        ChangeFrequency changefreq = resolveChangefreq(annotation);
+        LocalDateTime lastmod = resolveLastmod(annotation);
+        String[] annotationLocales = annotation != null ? annotation.locales() : new String[0];
 
-        var locales = localeResolver.resolveLocales(annotationLocales);
+        List<String> locales = localeResolver.resolveLocales(annotationLocales);
 
         if (locales.isEmpty()) {
             return List.of(SitemapUrl.builder(localeResolver.buildUrl(pattern))
@@ -174,7 +175,7 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
                     .build());
         }
 
-        var alternates = localeResolver.buildAlternates(pattern, locales);
+        Map<String, String> alternates = localeResolver.buildAlternates(pattern, locales);
         return locales.stream()
                 .map(locale -> SitemapUrl.builder(localeResolver.buildLocalizedUrl(pattern, locale))
                         .priority(priority)
@@ -195,7 +196,7 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
             return false;
         }
 
-        var methods = mappingInfo.getMethodsCondition().getMethods();
+        Set<RequestMethod> methods = mappingInfo.getMethodsCondition().getMethods();
         return methods.isEmpty() || methods.stream()
                 .anyMatch(m -> allowedMethods.contains(m.name()));
     }
@@ -210,7 +211,7 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
                     .map(p -> p.getPatternString())
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         }
-        var directPaths = mappingInfo.getDirectPaths();
+        Set<String> directPaths = mappingInfo.getDirectPaths();
         return (directPaths != null && !directPaths.isEmpty()) ? directPaths : Set.of();
     }
 
@@ -241,7 +242,7 @@ public class SitemapEndpointScanner implements ApplicationListener<ApplicationRe
                 .filter(v -> !v.isEmpty())
                 .map(value -> {
                     try {
-                        var toParse = value.contains("T") ? value : value + "T00:00:00";
+                        String toParse = value.contains("T") ? value : value + "T00:00:00";
                         return LocalDateTime.parse(toParse, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     } catch (DateTimeParseException e) {
                         log.warn("Failed to parse lastmod value '{}': {}", value, e.getMessage());

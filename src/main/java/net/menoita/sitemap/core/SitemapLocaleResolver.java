@@ -116,8 +116,8 @@ public class SitemapLocaleResolver {
      * @return the fully qualified URL with locale
      */
     public String buildLocalizedUrl(String path, String locale) {
-        var baseUrl = baseUrl();
-        var normalPath = ensureLeadingSlash(path);
+        String baseUrl = baseUrl();
+        String normalPath = ensureLeadingSlash(path);
 
         // Omit locale identifier for the default locale when configured
         if (properties.isOmitDefaultLocaleInUrl() && locale != null
@@ -128,8 +128,8 @@ public class SitemapLocaleResolver {
         return switch (properties.getLocaleUrlPattern()) {
             case PATH_PREFIX -> baseUrl + "/" + locale + normalPath;
             case QUERY_PARAM -> {
-                var fullUrl = baseUrl + normalPath;
-                var separator = fullUrl.contains("?") ? "&" : "?";
+                String fullUrl = baseUrl + normalPath;
+                String separator = fullUrl.contains("?") ? "&" : "?";
                 yield fullUrl + separator + properties.getLocaleQueryParamName() + "=" + locale;
             }
         };
@@ -161,7 +161,7 @@ public class SitemapLocaleResolver {
         }
 
         // Build locale -> URL entries preserving order
-        var alternates = locales.stream()
+        Map<String, String> alternates = locales.stream()
                 .collect(Collectors.toMap(
                         locale -> locale,
                         locale -> buildLocalizedUrl(path, locale),
@@ -169,7 +169,7 @@ public class SitemapLocaleResolver {
                         LinkedHashMap::new));
 
         // x-default points to the configured default locale, or the first locale
-        var xDefaultLocale = Optional.ofNullable(properties.getDefaultLocale())
+        String xDefaultLocale = Optional.ofNullable(properties.getDefaultLocale())
                 .filter(locales::contains)
                 .orElse(locales.get(0));
         alternates.put("x-default", buildLocalizedUrl(path, xDefaultLocale));

@@ -61,7 +61,7 @@ public class SitemapXmlGenerator {
     public String generateSitemap(Collection<SitemapUrl> urls) {
         boolean hasAlternates = urls.stream().anyMatch(u -> !u.alternates().isEmpty());
 
-        var sb = new StringBuilder(urls.size() * 256);
+        StringBuilder sb = new StringBuilder(urls.size() * 256);
         sb.append(XML_HEADER).append(URLSET_OPEN);
         if (hasAlternates) {
             sb.append(XHTML_NAMESPACE);
@@ -84,9 +84,9 @@ public class SitemapXmlGenerator {
      * @return the sitemap index XML string
      */
     public String generateSitemapIndex(int sitemapCount) {
-        var baseUrl = stripTrailingSlash(properties.getBaseUrl());
+        String baseUrl = stripTrailingSlash(properties.getBaseUrl());
 
-        var sb = new StringBuilder(sitemapCount * 128);
+        StringBuilder sb = new StringBuilder(sitemapCount * 128);
         sb.append(XML_HEADER).append(SITEMAP_INDEX_OPEN);
 
         IntStream.rangeClosed(1, sitemapCount).forEach(i ->
@@ -156,7 +156,7 @@ public class SitemapXmlGenerator {
         if (value == null) {
             return "";
         }
-        var sb = new StringBuilder(value.length() + 16);
+        StringBuilder sb = new StringBuilder(value.length() + 16);
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             switch (c) {

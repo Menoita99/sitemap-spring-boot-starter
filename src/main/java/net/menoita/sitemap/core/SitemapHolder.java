@@ -164,7 +164,7 @@ public class SitemapHolder {
      * @return a list of URLs for the requested page, or empty if the page is out of range
      */
     public List<SitemapUrl> getUrls(int page, int pageSize) {
-        var allUrls = new ArrayList<>(urls.values());
+        List<SitemapUrl> allUrls = new ArrayList<>(urls.values());
         int fromIndex = (page - 1) * pageSize;
         if (fromIndex >= allUrls.size()) {
             return Collections.emptyList();
