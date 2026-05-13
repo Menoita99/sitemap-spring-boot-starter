@@ -5,6 +5,7 @@ import net.menoita.sitemap.core.SitemapEndpointScanner;
 import net.menoita.sitemap.core.SitemapHolder;
 import net.menoita.sitemap.core.SitemapLocaleResolver;
 import net.menoita.sitemap.core.SitemapXmlGenerator;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -86,7 +87,7 @@ public class SitemapAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SitemapEndpointScanner sitemapEndpointScanner(
-            RequestMappingHandlerMapping handlerMapping,
+            @Qualifier("requestMappingHandlerMapping") RequestMappingHandlerMapping handlerMapping,
             SitemapHolder sitemapHolder,
             SitemapProperties properties,
             SitemapLocaleResolver localeResolver) {

@@ -44,6 +44,7 @@ tasks.withType<JavaCompile> {
 tasks.withType<Javadoc> {
     (options as StandardJavadocDocletOptions).apply {
         addStringOption("Xdoclint:none", "-quiet")
+        encoding = "UTF-8"
     }
 }
 
